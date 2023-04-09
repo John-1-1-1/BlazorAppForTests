@@ -1,0 +1,44 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using BlazorApp1.DataBaseClasses
+
+<div style="top: 25%; position: absolute; width: 100%;">
+    
+    <div style="height: 250px;  width: 250px; text-align: center;
+    text-align: center;
+    margin: auto;   
+    ">
+        <h2>Login Form</h2>
+        <EditForm Model="@PassData" OnValidSubmit="@HandleValidSubmit">
+            <ValidationSummary />
+
+            <p>
+                <label>Email</label><br/>
+                <input @bind="@PassData.Login" name='email'/>
+            </p>
+            <p>
+                <label>Password</label><br/>
+                <input @bind="@PassData.HashPass" type='password' name='password'/>
+            </p>
+            <input type='submit' value='Login'/>
+        </EditForm >
+    </div>
+</div>
+
+@code {
+    User PassData = new User();
+
+    private async  Task HandleValidSubmit() {
+        var errors = new Dictionary<string, List<string>>();
+
+        if (string.IsNullOrEmpty(PassData.Login))
+        {
+            errors.Add(nameof(PassData.Login),
+                new() { "For a 'Defense' ship classification, " +
+                        "'Description' is required." });
+        }
+
+       
+ // https://csharp.webdelphi.ru/rabota-s-formami-v-blazor-komponent-editform/
+        await Task.CompletedTask;
+    }
+}

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BlazorApp1.DataBaseClasses;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorApp1; 
 
@@ -13,16 +14,9 @@ public sealed class ApplicationContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasData(
-            new User { Id = 1, Name = "Tom", Age = 37 },
-            new User { Id = 2, Name = "Bob", Age = 41 },
-            new User { Id = 3, Name = "Sam", Age = 24 }
+            new User { Id = 1, Name = "Tom", Login = "ad" , HashPass = "12345"},
+            new User { Id = 2, Name = "Bob", Login = "da", HashPass = "12345"}
         );
     }
 }
 
-public class User
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int Age { get; set; }
-}

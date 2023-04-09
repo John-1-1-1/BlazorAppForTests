@@ -1,19 +1,26 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Security.Claims
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>BlazorApp1</PageTitle>
+<AuthorizeView>
+    <NotAuthorized>
+        <Login/>
+    </NotAuthorized>
+    <Authorized>
+        <div class="page">
+            <div class="sidebar">
+                <NavMenu/>
+            </div>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <main>
+                <div class="top-row px-4">
+                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                </div>
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    </Authorized>
+</AuthorizeView>
