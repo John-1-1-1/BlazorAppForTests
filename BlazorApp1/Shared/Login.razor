@@ -1,6 +1,13 @@
 ﻿@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using System.Text.Encodings.Web
+@using BlazorApp1.Data
 @using BlazorApp1.DataBaseClasses
-
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.EntityFrameworkCore.Internal
+@inject NavigationManager NavigationManager
+@inject IAccountService AccountService
 <div style="top: 25%; position: absolute; width: 100%;">
     
     <div style="height: 250px;  width: 250px; text-align: center;
@@ -8,8 +15,9 @@
     margin: auto;   
     ">
         <h2>Login Form</h2>
-        <EditForm Model="@PassData" OnValidSubmit="@HandleValidSubmit">
-            <ValidationSummary />
+        <EditForm Model="@PassData" OnValidSubmit="@HandleValidSubmit" >
+            <DataAnnotationsValidator  />
+            <ValidationSummary/>
 
             <p>
                 <label>Email</label><br/>
@@ -27,6 +35,11 @@
 @code {
     User PassData = new User();
 
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        AccountService.Login();
+    }
+
     private async  Task HandleValidSubmit() {
         var errors = new Dictionary<string, List<string>>();
 
@@ -36,9 +49,8 @@
                 new() { "For a 'Defense' ship classification, " +
                         "'Description' is required." });
         }
-
-       
- // https://csharp.webdelphi.ru/rabota-s-formami-v-blazor-komponent-editform/
-        await Task.CompletedTask;
+  
+        NavigationManager.NavigateTo("counter");
     }
+   
 }
