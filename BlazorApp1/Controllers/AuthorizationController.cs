@@ -5,25 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorApp1.Controllers; 
 
-public class LoginController : Controller {
-    // GET
+public class AuthorizationController : Controller {
     [HttpGet("login")]
-    public IActionResult Index1(string login, string pass) {
+    public IActionResult Login(string login, string pass) {
         
         var claims = new List<Claim> { 
-            new Claim(ClaimTypes.Name, "person.Login"), 
-            new Claim(ClaimTypes.Surname, "person.Name") };
+            new Claim("Login", login), 
+            new Claim(ClaimTypes.Surname, pass) };
         // создаем объект ClaimsIdentity
         ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-        CookieOptions options = new CookieOptions();
-        options.Expires = DateTime.Now.AddDays(1);
         // установка аутентификационных куки
         HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity));
         return Redirect("/");
     }
+
+    [HttpGet("logout")]
+    public IActionResult Logout() {
+        HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Redirect("/");
+    }
     
-   
 }

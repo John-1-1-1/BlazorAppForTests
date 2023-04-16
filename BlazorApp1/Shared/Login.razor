@@ -13,7 +13,6 @@
 @using Npgsql.Replication
 @using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue
 @inject NavigationManager NavigationManager
-@inject IAccountService AccountService
 @inject IHttpClientFactory ClientFactory
 @inject HttpClient httpClient
 
@@ -44,11 +43,6 @@
 @code {
     User PassData = new User();
 
-    protected override void OnInitialized() {
-        base.OnInitialized();
-        
-    }
-
     private async Task HandleValidSubmit() {    
         
         var errors = new Dictionary<string, List<string>>();
@@ -61,7 +55,7 @@
         }
         
             var query = new Dictionary<string, string> {  
-                { "login", "Jignesh" },  
+                { "login", PassData.Login },  
                 { "pass", "Trivedi" }  
             };  
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString("/login", query),  true);
