@@ -1,13 +1,22 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @using System.Security.Claims
+@using System.Text
 @using System.Text.Encodings.Web
+@using System.Text.Json
 @using BlazorApp1.Data
 @using BlazorApp1.DataBaseClasses
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.EntityFrameworkCore.Internal
+@using Microsoft.Net.Http.Headers
+@using Npgsql.Replication
+@using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue
 @inject NavigationManager NavigationManager
 @inject IAccountService AccountService
+@inject IHttpClientFactory ClientFactory
+@inject HttpClient httpClient
+
 <div style="top: 25%; position: absolute; width: 100%;">
     
     <div style="height: 250px;  width: 250px; text-align: center;
@@ -37,10 +46,11 @@
 
     protected override void OnInitialized() {
         base.OnInitialized();
-        AccountService.Login();
+        
     }
 
-    private async  Task HandleValidSubmit() {
+    private async Task HandleValidSubmit() {    
+        
         var errors = new Dictionary<string, List<string>>();
 
         if (string.IsNullOrEmpty(PassData.Login))
@@ -49,8 +59,11 @@
                 new() { "For a 'Defense' ship classification, " +
                         "'Description' is required." });
         }
-  
-        NavigationManager.NavigateTo("counter");
+        
+            var query = new Dictionary<string, string> {  
+                { "login", "Jignesh" },  
+                { "pass", "Trivedi" }  
+            };  
+        NavigationManager.NavigateTo(QueryHelpers.AddQueryString("/login", query),  true);
     }
-   
 }

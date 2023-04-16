@@ -2,5 +2,5 @@
 
 public interface IAccountService {
     void Init(ApplicationContext applicationContext);
-    void Login();
+    Task Login();
 }

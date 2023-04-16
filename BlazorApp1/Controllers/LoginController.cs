@@ -1,20 +1,15 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.AspNetCore.Mvc;
 
-namespace BlazorApp1.Data; 
+namespace BlazorApp1.Controllers; 
 
-public class AccountService: IAccountService {
-
-    private IHttpContextAccessor httpContextAccessor;
-    private HttpClient httpClient;
-    public AccountService(
-        IHttpContextAccessor HttpContextAccessor) {
-        httpContextAccessor = HttpContextAccessor;
-    }
-
-    public async Task Login() {
+public class LoginController : Controller {
+    // GET
+    [HttpGet("login")]
+    public IActionResult Index1(string login, string pass) {
+        
         var claims = new List<Claim> { 
             new Claim(ClaimTypes.Name, "person.Login"), 
             new Claim(ClaimTypes.Surname, "person.Name") };
@@ -24,14 +19,11 @@ public class AccountService: IAccountService {
         CookieOptions options = new CookieOptions();
         options.Expires = DateTime.Now.AddDays(1);
         // установка аутентификационных куки
-        await httpContextAccessor.HttpContext.SignInAsync(
+        HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity));
+        return Redirect("/");
     }
     
-
-
-    public void Init(ApplicationContext applicationContext) {
-        
-    }
+   
 }

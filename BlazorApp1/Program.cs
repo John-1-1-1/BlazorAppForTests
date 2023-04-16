@@ -16,7 +16,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
-
+builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAccountService, AccountService>();
 // аутентификация с помощью куки
@@ -31,6 +31,8 @@ string? connection = builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddDbContextFactory<ApplicationContext>(options => options.UseNpgsql(connection));
 var app = builder.Build();
 
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Error");
@@ -41,6 +43,7 @@ if (!app.Environment.IsDevelopment()) {
 app.UseStaticFiles();
 app.UseRouting();
 app.MapBlazorHub();
+app.MapControllers();
 app.UseAuthentication(); // добавление middleware аутентификации
 app.UseAuthorization(); // добавление middleware авторизации 
 app.MapFallbackToPage("/_Host");
