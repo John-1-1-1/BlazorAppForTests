@@ -11,6 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddTransient<DataBaseManager>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 // аутентификация с помощью куки
@@ -21,7 +22,7 @@ builder.Services.AddAuthorization();
 // получаем строку подключения из файла конфигурации
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 // добавляем контекст ApplicationContext в качестве сервиса в приложение
-builder.Services.AddDbContextFactory<ApplicationContext>(options => options.UseNpgsql(connection));
+builder.Services.AddDbContext<DataBaseContext>(options => options.UseNpgsql(connection));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -40,9 +41,7 @@ app.UseAuthorization(); // добавление middleware авторизаци�
 app.MapFallbackToPage("/_Host");
 app.MapHub<BlazorChatSampleHub>(BlazorChatSampleHub.HubUrl);
 // получение данных TODO:TESTS
-app.MapGet("/data", (ApplicationContext db) => db.Users.ToList());
-
-var context = app.Services.CreateScope().ServiceProvider.GetService<ApplicationContext>();
+app.MapGet("/data", (DataBaseContext db) => db.Users.ToList());
 
 // https://metanit.com/sharp/razorpages/2.6.php
 

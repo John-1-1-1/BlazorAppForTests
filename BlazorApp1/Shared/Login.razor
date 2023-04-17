@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.EntityFrameworkCore
 @using Microsoft.EntityFrameworkCore.Internal
 @using Microsoft.Net.Http.Headers
 @using Npgsql.Replication
@@ -15,6 +16,7 @@
 @inject NavigationManager NavigationManager
 @inject IHttpClientFactory ClientFactory
 @inject HttpClient httpClient
+@inject DataBaseManager DataBaseManager
 
 <div style="top: 25%; position: absolute; width: 100%;">
     
@@ -23,25 +25,48 @@
     margin: auto;   
     ">
         <h2>Login Form</h2>
-        <EditForm Model="@PassData" OnValidSubmit="@HandleValidSubmit" >
+        <EditForm  EditContext="@EditContext" OnValidSubmit="@HandleValidSubmit" >
             <DataAnnotationsValidator  />
-            <ValidationSummary/>
 
             <p>
                 <label>Email</label><br/>
                 <input @bind="@PassData.Login" name='email'/>
+                 <ValidationMessage For="@(() => PassData.Login)" />
             </p>
             <p>
                 <label>Password</label><br/>
-                <input @bind="@PassData.HashPass" type='password' name='password'/>
+                <input @bind="@PassData.Pass" type='password' name='password'/>
+                <ValidationMessage For="@(() => PassData.Pass)" />
             </p>
+            <ValidationMessage For="@(() => pass)" />
             <input type='submit' value='Login'/>
         </EditForm >
     </div>
 </div>
 
 @code {
+    
     User PassData = new User();
+
+    ValidationMessageStore _messageStore;
+    
+    protected override void OnInitialized() {   
+        base.OnInitialized();
+        EditContext = new EditContext(PassData);
+        
+        EditContext.OnValidationRequested += HandleValidationRequested;
+        _messageStore = new ValidationMessageStore(EditContext);
+    }
+
+    private bool pass = true;
+    
+    private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e) {
+
+        _messageStore.Clear();
+        if (DataBaseManager.IsExistUser(PassData.Login, PassData.Pass)) {
+            _messageStore.Add(() => pass, "Не верный логин или пароль");
+        }
+    }
 
     private async Task HandleValidSubmit() {    
         
@@ -54,10 +79,16 @@
                         "'Description' is required." });
         }
         
+    // если пользователь не найден, отправляем статусный код 401
+        //if (person is null) return Results.Unauthorized();
+        
             var query = new Dictionary<string, string> {  
                 { "login", PassData.Login },  
                 { "pass", "Trivedi" }  
             };  
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString("/login", query),  true);
     }
+
+    public EditContext EditContext { get; set; }
+
 }
