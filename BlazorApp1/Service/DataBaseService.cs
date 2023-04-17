@@ -1,13 +1,14 @@
-﻿using BlazorApp1.Shared;
+﻿using BlazorApp1.Data;
 
-namespace BlazorApp1.Data; 
+namespace BlazorApp1.Service; 
 
-public class DataBaseManager {
+public class DataBaseService: IDataBaseService {
 
-    private readonly DataBaseContext _dataBaseContext;
-    
-    public DataBaseManager(DataBaseContext dataBaseContext) {
+    readonly DataBaseContext _dataBaseContext = new(); 
+
+    public DataBaseService(DataBaseContext dataBaseContext) {
         this._dataBaseContext = dataBaseContext;
+        
     }
 
     public bool IsExistUser(string login, string pass) {

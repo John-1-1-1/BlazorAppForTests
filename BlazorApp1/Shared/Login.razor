@@ -5,6 +5,7 @@
 @using System.Text.Json
 @using BlazorApp1.Data
 @using BlazorApp1.DataBaseClasses
+@using BlazorApp1.Service
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.WebUtilities
@@ -16,7 +17,7 @@
 @inject NavigationManager NavigationManager
 @inject IHttpClientFactory ClientFactory
 @inject HttpClient httpClient
-@inject DataBaseManager DataBaseManager
+@inject IDataBaseService DataBaseService
 
 <div style="top: 25%; position: absolute; width: 100%;">
     
@@ -30,15 +31,15 @@
 
             <p>
                 <label>Email</label><br/>
-                <input @bind="@PassData.Login" name='email'/>
-                 <ValidationMessage For="@(() => PassData.Login)" />
+                <input @bind="@_passData.Login" name='email'/>
+                 <ValidationMessage For="@(() => _passData.Login)" />
             </p>
             <p>
                 <label>Password</label><br/>
-                <input @bind="@PassData.Pass" type='password' name='password'/>
-                <ValidationMessage For="@(() => PassData.Pass)" />
+                <input @bind="@_passData.Pass" type='password' name='password'/>
+                <ValidationMessage For="@(() => _passData.Pass)" />
             </p>
-            <ValidationMessage For="@(() => pass)" />
+            <ValidationMessage For="@(() => _pass)" />
             <input type='submit' value='Login'/>
         </EditForm >
     </div>
@@ -46,35 +47,39 @@
 
 @code {
     
-    User PassData = new User();
+    User _passData = new User();
 
-    ValidationMessageStore _messageStore;
+    private EditContext? EditContext { get; set; }
+    
+    private bool _pass = true;
+    
+    ValidationMessageStore? _messageStore;
     
     protected override void OnInitialized() {   
         base.OnInitialized();
-        EditContext = new EditContext(PassData);
+        EditContext = new EditContext(_passData);
         
         EditContext.OnValidationRequested += HandleValidationRequested;
         _messageStore = new ValidationMessageStore(EditContext);
     }
 
-    private bool pass = true;
-    
     private void HandleValidationRequested(object? sender, ValidationRequestedEventArgs e) {
 
-        _messageStore.Clear();
-        if (DataBaseManager.IsExistUser(PassData.Login, PassData.Pass)) {
-            _messageStore.Add(() => pass, "Не верный логин или пароль");
+        _messageStore?.Clear();
+        
+        if (!DataBaseService.IsExistUser(_passData.Login, HashSha256Service.CreateSha256(_passData.Pass))) {
+            _messageStore?.Add(() => _pass, "Не верный логин или пароль");
         }
     }
 
-    private async Task HandleValidSubmit() {    
+    private Task HandleValidSubmit() {    
         
         var errors = new Dictionary<string, List<string>>();
+        
 
-        if (string.IsNullOrEmpty(PassData.Login))
+        if (string.IsNullOrEmpty(_passData.Login))
         {
-            errors.Add(nameof(PassData.Login),
+            errors.Add(nameof(_passData.Login),
                 new() { "For a 'Defense' ship classification, " +
                         "'Description' is required." });
         }
@@ -83,12 +88,11 @@
         //if (person is null) return Results.Unauthorized();
         
             var query = new Dictionary<string, string> {  
-                { "login", PassData.Login },  
-                { "pass", "Trivedi" }  
+                { "login", _passData.Login },  
+                { "hashPass", HashSha256Service.CreateSha256(_passData.Pass) }  
             };  
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString("/login", query),  true);
+        return Task.CompletedTask;
     }
-
-    public EditContext EditContext { get; set; }
 
 }

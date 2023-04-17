@@ -1,6 +1,7 @@
 
 using BlazorApp1;
 using BlazorApp1.Data;
+using BlazorApp1.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddTransient<DataBaseManager>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 // аутентификация с помощью куки
@@ -23,6 +22,9 @@ builder.Services.AddAuthorization();
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 // добавляем контекст ApplicationContext в качестве сервиса в приложение
 builder.Services.AddDbContext<DataBaseContext>(options => options.UseNpgsql(connection));
+
+builder.Services.AddTransient<IDataBaseService,DataBaseService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
