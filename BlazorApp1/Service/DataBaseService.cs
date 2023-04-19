@@ -17,6 +17,10 @@ public class DataBaseService: IDataBaseService {
     }
 
     public List<User> GetUsers() {
-        return _dataBaseContext.Users.Include(b => b.Post).ToList();
+        return _dataBaseContext.Users.Include(b => b.Post).Include(b => b.Role).ToList();
+    }
+
+    public User? GetUserByLogin(string login) {
+        return _dataBaseContext.Users.Include(b => b.Post).Include(b => b.Role).FirstOrDefault(u => u.Login == login);
     }
 }

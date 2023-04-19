@@ -1,6 +1,11 @@
-﻿namespace BlazorApp1.DataBaseClasses; 
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlazorApp1.DataBaseClasses; 
 
 public class Role {
-    public string Name { get; set; }
-    public Role(string name) => Name = name;
+
+    [Key] 
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public List<User>? User { get; set; }
 }

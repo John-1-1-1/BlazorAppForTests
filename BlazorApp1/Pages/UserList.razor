@@ -1,0 +1,44 @@
+﻿@page "/fetchdata"
+@using BlazorApp1.Service
+@using BlazorApp1.DataBaseClasses
+
+@inject IDataBaseService DataBaseService
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <PageTitle>UserList</PageTitle>
+        <h1>Пользователи сети:</h1>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>ФИО</th>
+                <th>Пост</th>
+                <th>Роль</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var user in Users) {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@(user.LastName + " " + user.Name + " " + user.MiddleName)</td>
+                    <td>@user.Post.PostName</td>
+                    <td>@user.Role.Name</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        @code {
+            private List<User> Users;
+            protected override async Task OnInitializedAsync() {
+                Users = DataBaseService.GetUsers();
+            }
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        <RoleNoAccess/>
+    </NotAuthorized>
+</AuthorizeView>

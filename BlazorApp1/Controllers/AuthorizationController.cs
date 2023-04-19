@@ -13,7 +13,7 @@ public class AuthorizationController : Controller {
     }
     
     [HttpGet("login")]
-    public IActionResult Login(string login, string hashPass) {
+    public IActionResult Login(string login, string hashPass, string role) {
 
         if (!_dataBaseService.IsExistUser(login, hashPass)) {
             return Ok("UserNotFound");
@@ -21,7 +21,9 @@ public class AuthorizationController : Controller {
         
         // TODO: add another data 
         var claims = new List<Claim> { 
-            new Claim("Login", login) };
+            new Claim("Login", login),
+            new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
+        };
         // создаем объект ClaimsIdentity
         ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
         // установка аутентификационных куки

@@ -6,5 +6,5 @@ public class PostUser {
     [Key]
     public int Id { get; set; }
     public string PostName { get; set; } = "";
-    public User? User { get; set; }
+    public List<User>? User { get; set; }
 }

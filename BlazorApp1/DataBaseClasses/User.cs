@@ -20,6 +20,7 @@ public class User {
     public int PostId { get; set; }
     [ForeignKey("PostId")]
     public PostUser? Post { get; set; }
-
-    public string Role { get; set; } = "";
+    public int RoleId { get; set; }
+    [ForeignKey("RoleId")]
+    public Role? Role { get; set; }
 }

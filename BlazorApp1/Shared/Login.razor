@@ -85,9 +85,12 @@
     // если пользователь не найден, отправляем статусный код 401
     //if (person is null) return Results.Unauthorized();
 
+        var user = DataBaseService.GetUserByLogin(_passData.Login);
+        
         var query = new Dictionary<string, string> {
             { "login", _passData.Login },
-            { "hashPass", HashSha256Service.CreateSha256(_passData.Pass) }
+            { "hashPass", HashSha256Service.CreateSha256(_passData.Pass) },
+            { "role", user.Role.Name }
         };
         NavigationManager.NavigateTo(QueryHelpers.AddQueryString("/login", query), true);
         return Task.CompletedTask;
