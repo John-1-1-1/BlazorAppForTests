@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace BlazorApp1; 
+namespace BlazorApp1.Service; 
 
 public class BlazorChatSampleHub : Hub
 {

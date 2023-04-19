@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using BlazorApp1.Data;
+using BlazorApp1.Service;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;

@@ -1,5 +1,8 @@
 ﻿@page "/fetchdata"
-@using BlazorApp1.Data
+@using BlazorApp1.Service
+@using BlazorApp1.DataBaseClasses
+
+@inject IDataBaseService DataBaseService
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -8,17 +11,33 @@
 <p>This component demonstrates fetching data from a service.</p>
 
 else {
-    <table class="table">
-        <thead>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>ФИО</th>
+        <th>Пост</th>
+        <th>Роль</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Users) {
         <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
+            <td>@user.Id</td>
+            <td>@(user.LastName + " " + user.Name + " " + user.MiddleName)</td>
+            <td>@user.Post.PostName</td>
+            <td>@user.Role</td>
         </tr>
-        </thead>
-        <tbody>
-        
-        </tbody>
-    </table>
+    }
+    </tbody>
+</table>
+}
+
+@code {
+    private List<User> Users;
+
+    protected override async Task OnInitializedAsync() {
+        Users = DataBaseService.GetUsers();
+    }
+
 }

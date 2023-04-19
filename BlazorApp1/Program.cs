@@ -1,6 +1,5 @@
 
 using BlazorApp1;
-using BlazorApp1.Data;
 using BlazorApp1.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +41,6 @@ app.UseAuthentication(); // добавление middleware аутентифик
 app.UseAuthorization(); // добавление middleware авторизации 
 app.MapFallbackToPage("/_Host");
 app.MapHub<BlazorChatSampleHub>(BlazorChatSampleHub.HubUrl);
-// получение данных TODO:TESTS
-app.MapGet("/data", (DataBaseContext db) => db.Users.ToList());
 
 // https://metanit.com/sharp/razorpages/2.6.php
 
