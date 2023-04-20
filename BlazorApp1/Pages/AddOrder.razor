@@ -1,9 +1,41 @@
-@page "/counter"
+﻿@page "/addOrder"
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavigationManager
 
-<h3>AddOrder</h3>
+
+<h2>Login Form</h2>
+
+<EditForm Model="@_fileUplloadModel" action="upload" enctype="multipart/form-data" 
+          OnValidSubmit="@OnValid">
+    <input type="file" name="uploads"  
+           @bind="@_fileUplloadModel.e"/><br>
+    <InputFile OnChange="@OnInputFileChange" multiple/>
+        <input type="submit" value="Загрузить" />
+    </EditForm>
 
 @code {
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+       
+    }
     
+    FileUplloadModel _fileUplloadModel = new FileUplloadModel();
+
+    private void OnValid() {
+        
+    }
+
+
+    public class FileUplloadModel {
+        public string? e;
+        public InputFile d;
+        public IFormFile FormFile { get; set; }
+        public object F { get; set; }
+    }
+
+    private void OnInputFileChange(InputFileChangeEventArgs obj) {
+        
+    }
+
 }
