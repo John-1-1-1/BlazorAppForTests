@@ -1,41 +1,59 @@
 ﻿@page "/addOrder"
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavigationManager
-
+@inject IWebHostEnvironment _appEnvironment;
 
 <h2>Login Form</h2>
 
-<EditForm Model="@_fileUplloadModel" action="upload" enctype="multipart/form-data" 
+<EditForm EditContext="@EditContext" action="upload" enctype="multipart/form-data"
           OnValidSubmit="@OnValid">
-    <input type="file" name="uploads"  
+    
+    <DataAnnotationsValidator/>
+
+    <input type="file" name="uploads"
            @bind="@_fileUplloadModel.e"/><br>
-    <InputFile OnChange="@OnInputFileChange" multiple/>
-        <input type="submit" value="Загрузить" />
-    </EditForm>
+    <InputFile OnChange="@OnInputFileChange"/>
+    <input type="submit" value="Загрузить"/>
+</EditForm>
 
 @code {
 
-    protected override void OnInitialized() {
-        base.OnInitialized();
-       
-    }
+    private ValidationMessageStore? _messageStore;    
+
+    private EditContext? EditContext { get; set; }
     
     FileUplloadModel _fileUplloadModel = new FileUplloadModel();
-
-    private void OnValid() {
-        
-    }
-
-
+    
     public class FileUplloadModel {
         public string? e;
         public InputFile d;
         public IFormFile FormFile { get; set; }
         public object F { get; set; }
     }
+    
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        
+        EditContext = new EditContext(_fileUplloadModel);
+        _messageStore = new ValidationMessageStore(EditContext);
+    }
 
-    private void OnInputFileChange(InputFileChangeEventArgs obj) {
+    private void OnValid() {
         
     }
 
+    private async Task OnInputFileChange(InputFileChangeEventArgs obj) {
+        string[] list = obj.File.Name.Split(".");
+        List<string> formats = new List<string>(){"jpg", "jpeg", "png" };
+        if (formats.IndexOf(list[list.Length - 1]) != -1) {
+            var uploadedFile = obj.File;
+            string uploadPath = Path.Combine(_appEnvironment.WebRootPath, "upload");
+            Directory.CreateDirectory(uploadPath);
+            string uploadFile = Path.Combine(uploadPath, uploadedFile.Name);
+            await using FileStream fs = new(uploadFile, FileMode.Create);
+            await obj.File.OpenReadStream().CopyToAsync(fs);  
+            
+        }
+        
+    }
 }
