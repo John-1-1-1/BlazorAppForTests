@@ -16,7 +16,7 @@ public class DataBaseService: IDataBaseService {
         return user != null;
     }
 
-    public List<User> GetUsers() {
+    public List<User>? GetUsers() {
         return _dataBaseContext.Users.Include(b => b.Post).Include(b => b.Role).ToList();
     }
 

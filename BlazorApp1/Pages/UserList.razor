@@ -4,7 +4,7 @@
 
 @inject IDataBaseService DataBaseService
 
-<AuthorizeView Roles="Admin">
+<AuthorizeView  Context="auth" Roles="Admin">
     <Authorized>
         <PageTitle>UserList</PageTitle>
         <h1>Пользователи сети:</h1>
@@ -19,22 +19,101 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var user in Users) {
-                <tr>
-                    <td>@user.Id</td>
-                    <td>@(user.LastName + " " + user.Name + " " + user.MiddleName)</td>
-                    <td>@user.Post.PostName</td>
-                    <td>@user.Role.Name</td>
-                </tr>
+            @if (_users == null) {
+                <p>Нет пользователей</p>
+            }
+            else {
+                @foreach (var user in _users) {
+                    <tr>
+                        <td>@user.Id</td>
+                        <td>@(user.LastName + " " + user.Name + " " + user.MiddleName)</td>
+                        <td>@user.Post?.PostName</td>
+                        <td>@user.Role?.Name</td>
+                    </tr>
+                }
             }
             </tbody>
         </table>
+    
+        <Modal @ref="Modal">
+            <Title>Добавление пользователя</Title>
+            <Body>
+            <EditForm EditContext="@EeditContext">
+                <DataAnnotationsValidator/>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <p>
+                                <label for="last_name_add">Фамилия</label>
+                                <br/>
+                                <input @bind="@User.LastName" name='last_name_add' id="last_name_add"/>
+                            </p>
+                            <p>
+                                <label for="name_add">Имя</label>
+                                <br/>
+                                <input @bind="@User.Name" name='name_add' id="name_add"/>
+                            </p>
+                            <p>
+                                <label for="middle_name_add">Отчество</label>
+                                <br/>
+                                <input @bind="@User.MiddleName" name='middle_name_add' id="middle_name_add"/>
+                            </p>
+                        </div>
+                        <div class="col-sm">
+                            <p>
+                                <label for="login_add">Логин</label>
+                                <br/>
+                                <input @bind="@User.Login" name='login_add' id="login_add"/>
+                            </p>
+                            <p>
+                                <label for="pass_add">Пароль</label>
+                                <br/>
+                                <input @bind="@User.Pass" name='pass_add' id="pass_add"/>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm">
+                      Одна из трёх колонок
+                    </div>
+                    <div class="col-sm">
+                      Одна из трёх колонок
+                    </div>
+                    <div class="col-sm">
+                      Одна из трёх колонок
+                    </div>
+                  </div>
+                </div>
+            </EditForm>
+            </Body>
+            <Footer>
+                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@Close">Close</button>
+            </Footer>
+        </Modal>
+        <button @onclick="@Open">Open Modal</button>
 
+        
         @code {
-            private List<User> Users;
-            protected override async Task OnInitializedAsync() {
-                Users = DataBaseService.GetUsers();
+
+            private EditContext? EeditContext { get; set; }
+                
+            private User User { get; set; } = new();
+
+            protected override void OnInitialized() {
+                base.OnInitialized();
+                _users = DataBaseService.GetUsers();
+                EeditContext = new EditContext(User);
             }
+            private Modal? Modal { get; set; }
+            
+            private List<User>? _users;
+
+            private void Open() => Modal?.Open();
+            
+            private void Close() => Modal?.Close();
         }
 
     </Authorized>
