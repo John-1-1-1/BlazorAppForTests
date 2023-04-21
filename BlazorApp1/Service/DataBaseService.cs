@@ -23,4 +23,26 @@ public class DataBaseService: IDataBaseService {
     public User? GetUserByLogin(string login) {
         return _dataBaseContext.Users.Include(b => b.Post).Include(b => b.Role).FirstOrDefault(u => u.Login == login);
     }
+
+    public List<Role>? GetRoles() {
+        return _dataBaseContext.Role.ToList();
+    }
+    
+    public List<PostUser>? GetPosts() {
+        return _dataBaseContext.PostUsers.ToList();
+    }
+
+    public void DeleteUser(int userId) {
+        _dataBaseContext.Users.Remove(GetUserById(userId));
+        _dataBaseContext.SaveChanges();
+    }
+
+    public User GetUserById(int userId) {
+        return _dataBaseContext.Users.FirstOrDefault(u => u.Id == userId);
+    }
+
+    public void AddUser(User user) {
+        _dataBaseContext.Users.Add(user);
+        _dataBaseContext.SaveChanges();
+    }
 }
