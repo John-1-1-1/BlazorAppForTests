@@ -8,34 +8,44 @@
 <AuthorizeView  Context="auth" Roles="Admin">
     <Authorized>
         <PageTitle>UserList</PageTitle>
-        <h1>Пользователи сети:</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-8">
+                    <h1>Пользователи сети:</h1>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Id</th>
-                <th>ФИО</th>
-                <th>Пост</th>
-                <th>Роль</th>
-            </tr>
-            </thead>
-            <tbody>
-            @if (_users == null) {
-                <p>Нет пользователей</p>
-            }
-            else {
-                @foreach (var user in _users) {
-                    <tr>
-                        <td>@user.Id</td>
-                        <td>@(user.LastName + " " + user.Name + " " + user.MiddleName)</td>
-                        <td>@user.Post?.PostName</td>
-                        <td>@user.Role?.Name</td>
-                        <td><button type="button" @onclick="()=> DeleteUser(user.Id)">Удалить</button></td>
-                    </tr>
-                }
-            }
-            </tbody>
-        </table>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>ФИО</th>
+                            <th>Пост</th>
+                            <th>Роль</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (_users == null) {
+                            <p>Нет пользователей</p>
+                        }
+                        else {
+                            @foreach (var user in _users) {
+                                <tr>
+                                    <td>@user.Id</td>
+                                    <td>@(user.LastName + " " + user.Name + " " + user.MiddleName)</td>
+                                    <td>@user.Post?.PostName</td>
+                                    <td>@user.Role?.Name</td>
+                                    <td><button type="button" @onclick="() => DeleteUser(user.Id)">Удалить</button></td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-2">
+                    <button @onclick="@Open">Добавить пользователя</button>
+                    <button @onclick="@OpenRolesModal">Добавить роль</button>
+                </div>
+            </div>
+        </div>
     
         <Modal @ref="Modal">
             <Title>Добавление пользователя</Title>
@@ -105,12 +115,87 @@
             </EditForm>
             </Body>
             <Footer>
-                <button type="button" class="btn btn-primary" @onclick="@Validate">Save changes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@Close">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="@Validate">Сохранить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@Close">Выйти</button>
             </Footer>
         </Modal>
-        <button @onclick="@Open">Open Modal</button>
 
+        <Modal @ref="@ModalRole">
+            <Title>Роли</Title>
+            <Body>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Роль</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @if (_roles == null) {
+                                <p>Нет пользователей</p>
+                            }
+                            else {
+                                @foreach (var role in _roles) {
+                                    <tr>
+                                        <td>@role.Id</td>
+                                        <td>@role.Name</td>
+                                        <td><button type="button" @onclick="() => DeleteRole(role.Id)">Удалить</button></td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <EditForm EditContext="@EditContextRole">
+                <DataAnnotationsValidator/>
+                <p>
+                    <label for="role_add">Наименование роли</label>
+                    <br/>
+                    <input @bind="@Role.Name" name='role_add' id="role_add"/>
+                    <ValidationMessage For="@(() => Role.Name)"/>
+                </p>
+            </EditForm>
+            </Body>
+            <Footer>
+                <button type="button" class="btn btn-primary" @onclick="@ValidateRole">Сохранить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@CloseRole">Выйти</button>
+            </Footer>
+            @code {
+                
+                public Role Role { get; set; } = new Role();
+
+                public EditContext EditContextRole { get; set; }
+
+                public void OpenRolesModal() {
+                    EditContextRole = new EditContext(Role);
+                    ModalRole.Open();
+                }
+                
+                private Modal? ModalRole { get; set; }
+
+                private void ValidateRole() {
+                    if (EditContextRole.Validate()) {
+                        DataBaseService.AddRole(Role);
+                        Role = new Role();
+                        EditContextRole = new EditContext(Role);
+                        UpdateTableRoles();
+                        Close();
+                    }
+                }
+                private void UpdateTableRoles() {
+                    _roles = DataBaseService.GetRoles();
+                    InvokeAsync(StateHasChanged);
+                }
+
+                private void CloseRole() => ModalRole.Close();
+            }
+        </Modal>
+        
     </Authorized>
     <NotAuthorized>
         <RoleNoAccess/>
@@ -119,14 +204,20 @@
 
 @code {
 
+    private List<Role> _roles;
+    
     private EditContext? EditContext { get; set; }
                 
     private User User { get; set; } = new();
 
     protected override void OnInitialized() {
         base.OnInitialized();
+        
         _users = DataBaseService.GetUsers();
+        _roles = DataBaseService.GetRoles();
+        
         EditContext = new EditContext(User);
+        EditContextRole = new EditContext(Role);
     }
     private Modal? Modal { get; set; }
             
@@ -140,6 +231,7 @@
         if (EditContext.Validate()) {
             DataBaseService.AddUser(User);
             User = new User();
+            EditContext = new EditContext(User);
             UpdateTable();
             Close();
         }
@@ -154,4 +246,10 @@
         DataBaseService.DeleteUser(userId);
         UpdateTable();
     }
+
+    private void DeleteRole(int roleId) {
+        DataBaseService.DeleteRole(roleId);
+        UpdateTable();
+    }
+
 }

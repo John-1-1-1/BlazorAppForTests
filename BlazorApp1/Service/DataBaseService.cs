@@ -45,4 +45,19 @@ public class DataBaseService: IDataBaseService {
         _dataBaseContext.Users.Add(user);
         _dataBaseContext.SaveChanges();
     }
+
+    public void AddRole(Role role) {
+        _dataBaseContext.Role.Add(role);
+        _dataBaseContext.SaveChanges();
+    }
+
+    public void DeleteRole(int roleId) {
+        
+        _dataBaseContext.Role.Remove(GetRoleById(roleId));
+        _dataBaseContext.SaveChanges();
+    }
+
+    private Role GetRoleById(int roleId) {
+        return _dataBaseContext.Role.FirstOrDefault(u => u.Id == roleId);
+    }
 }
