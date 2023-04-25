@@ -57,6 +57,20 @@ public class DataBaseService: IDataBaseService {
         _dataBaseContext.SaveChanges();
     }
 
+    public void AddPost(PostUser post) {
+        _dataBaseContext.PostUsers.Add(post);
+        _dataBaseContext.SaveChanges();
+    }
+
+    public void DeletePost(int postId) {
+        _dataBaseContext.PostUsers.Remove(GetPostById(postId));
+        _dataBaseContext.SaveChanges();
+    }
+
+    private PostUser GetPostById(int postId) {
+        return _dataBaseContext.PostUsers.FirstOrDefault(u => u.Id == postId);
+    }
+
     private Role GetRoleById(int roleId) {
         return _dataBaseContext.Role.FirstOrDefault(u => u.Id == roleId);
     }

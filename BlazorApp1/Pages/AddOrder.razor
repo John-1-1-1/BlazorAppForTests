@@ -10,9 +10,9 @@
     
     <DataAnnotationsValidator/>
 
-    <input type="file" name="uploads"
+    <input type="file" name="uploads" a
            @bind="@_fileUplloadModel.e"/><br>
-    <InputFile OnChange="@OnInputFileChange"/>
+    <InputFile  OnChange="@OnInputFileChange" accept="image/png, image/jpeg"/>
     <input type="submit" value="Загрузить"/>
 </EditForm>
 

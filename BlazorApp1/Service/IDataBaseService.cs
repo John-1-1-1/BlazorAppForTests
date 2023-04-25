@@ -15,4 +15,6 @@ public interface IDataBaseService {
     public void AddUser(User user);
     public void AddRole(Role role);
     public void DeleteRole(int roleId);
+    public void AddPost(PostUser post);
+    public void DeletePost(int postId);
 }

@@ -41,8 +41,12 @@
                     </table>
                 </div>
                 <div class="col-2">
-                    <button @onclick="@Open">Добавить пользователя</button>
-                    <button @onclick="@OpenRolesModal">Добавить роль</button>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button class="btn btn-primary"
+                                @onclick="@Open">Добавить пользователя</button>
+                        <button class="btn btn-primary"
+                                @onclick="@OpenRolesModal">Добавить должность</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,7 +125,7 @@
         </Modal>
 
         <Modal @ref="@ModalRole">
-            <Title>Роли</Title>
+            <Title>Должности</Title>
             <Body>
             <div class="container">
                 <div class="row">
@@ -130,19 +134,19 @@
                             <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Роль</th>
+                                <th>Должность</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @if (_roles == null) {
+                            @if (_posts == null) {
                                 <p>Нет пользователей</p>
                             }
                             else {
-                                @foreach (var role in _roles) {
+                                @foreach (var post in _posts) {
                                     <tr>
-                                        <td>@role.Id</td>
-                                        <td>@role.Name</td>
-                                        <td><button type="button" @onclick="() => DeleteRole(role.Id)">Удалить</button></td>
+                                        <td>@post.Id</td>
+                                        <td>@post.PostName</td>
+                                        <td><button type="button" @onclick="() => DeletePost(post.Id)">Удалить</button></td>
                                     </tr>
                                 }
                             }
@@ -151,48 +155,53 @@
                     </div>
                 </div>
             </div>
-            <EditForm EditContext="@EditContextRole">
+            <EditForm EditContext="@EditContextPost">
                 <DataAnnotationsValidator/>
                 <p>
-                    <label for="role_add">Наименование роли</label>
+                    <label for="role_add">Наименование должности</label>
                     <br/>
-                    <input @bind="@Role.Name" name='role_add' id="role_add"/>
-                    <ValidationMessage For="@(() => Role.Name)"/>
+                    <input @bind="@Post.PostName" name='role_add' id="role_add"/>
+                    <ValidationMessage For="@(() => Post.PostName)"/>
                 </p>
             </EditForm>
             </Body>
             <Footer>
-                <button type="button" class="btn btn-primary" @onclick="@ValidateRole">Сохранить</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@CloseRole">Выйти</button>
+                <button type="button" class="btn btn-primary" @onclick="@ValidatePost">Сохранить</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@ClosePost">Выйти</button>
             </Footer>
             @code {
                 
-                public Role Role { get; set; } = new Role();
+                public PostUser Post { get; set; } = new PostUser();
 
-                public EditContext EditContextRole { get; set; }
+                public EditContext EditContextPost { get; set; }
 
                 public void OpenRolesModal() {
-                    EditContextRole = new EditContext(Role);
+                    EditContextPost = new EditContext(Post);
                     ModalRole.Open();
                 }
                 
                 private Modal? ModalRole { get; set; }
 
-                private void ValidateRole() {
-                    if (EditContextRole.Validate()) {
-                        DataBaseService.AddRole(Role);
-                        Role = new Role();
-                        EditContextRole = new EditContext(Role);
-                        UpdateTableRoles();
+                private void ValidatePost() {
+                    if (EditContextPost.Validate()) {
+                        DataBaseService.AddPost(Post);
+                        Post = new PostUser();
+                        EditContextPost = new EditContext(Post);
+                        UpdateTablePost();
                         Close();
                     }
                 }
-                private void UpdateTableRoles() {
-                    _roles = DataBaseService.GetRoles();
+                private void UpdateTablePost() {
+                    _posts = DataBaseService.GetPosts();
                     InvokeAsync(StateHasChanged);
                 }
 
-                private void CloseRole() => ModalRole.Close();
+                private void ClosePost() {
+                    Post = new PostUser();
+                    EditContextPost = new EditContext(Post);
+                    ModalRole.Close();
+                }
+
             }
         </Modal>
         
@@ -204,7 +213,7 @@
 
 @code {
 
-    private List<Role> _roles;
+    private List<PostUser> _posts;
     
     private EditContext? EditContext { get; set; }
                 
@@ -214,10 +223,10 @@
         base.OnInitialized();
         
         _users = DataBaseService.GetUsers();
-        _roles = DataBaseService.GetRoles();
+        _posts = DataBaseService.GetPosts();
         
         EditContext = new EditContext(User);
-        EditContextRole = new EditContext(Role);
+        EditContextPost = new EditContext(Post);
     }
     private Modal? Modal { get; set; }
             
@@ -229,6 +238,7 @@
 
     private void Validate() {
         if (EditContext.Validate()) {
+            User.Pass = HashSha256Service.CreateSha256(User.Pass);
             DataBaseService.AddUser(User);
             User = new User();
             EditContext = new EditContext(User);
@@ -247,9 +257,9 @@
         UpdateTable();
     }
 
-    private void DeleteRole(int roleId) {
-        DataBaseService.DeleteRole(roleId);
-        UpdateTable();
+    private void DeletePost(int roleId) {
+        DataBaseService.DeletePost(roleId);
+        UpdateTablePost();
     }
 
 }
