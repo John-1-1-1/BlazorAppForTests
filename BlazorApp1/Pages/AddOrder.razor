@@ -6,40 +6,45 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDataBaseService DataBaseService
 
-<h2>Login Form</h2>
+<AuthorizeView Context="auth" Roles="Admin, Customer">
+    <Authorized>
+        <h2>Добавление заказа</h2>
 
-<EditForm EditContext="@EditContext" action="upload" enctype="multipart/form-data"
-          OnValidSubmit="@OnValid">
-    <DataAnnotationsValidator/>
-    
-    <div class="container">
-        <div class="p-4 border bg-light align-self-center col-md-10 offset-md-1">
-            <div class="row p-2">
-                <label for="Header">Заголовок</label>
-                <input type="text" name = "Header" id = "Header" @bind="_order.Header"/>
-                <ValidationMessage For="@(() => _order.Header)"/>
-            </div>
-            <div class="row p-2">
-                <div class="col-sm">
-                    <InputFile @onclick="@OnInputFileClick" OnChange="@OnInputFileChange" accept="image/png, image/jpeg"/>
-                </div>
-                <div class="col-sm">
-                    <img src="@_order.ImagePath" height="200px"/>
-                </div>
-            </div>
-            <div class="row p-2">
-                <label for="Description">Комментарий</label>
-                <textarea cols="40" rows="3" @bind="_order.Description" id = "Description" name = "Description"/>
-                <ValidationMessage For="@(() => _order.Header)"/>
-            </div>
-            <div class="row p-2">
-                <input type="submit" value="Загрузить"/>
-            </div>
-        </div>
-    </div>
-</EditForm>
+        <EditForm EditContext="@EditContext" action="upload" enctype="multipart/form-data"
+                  OnValidSubmit="@OnValid">
+            <DataAnnotationsValidator/>
 
-@code {
+            <div class="container">
+                <div class="p-4 border bg-light align-self-center col-md-10 offset-md-1">
+                    <div class="row p-2">
+                        <label for="Header">Заголовок</label>
+                        <input type="text" name="Header" id="Header" @bind="_order.Header"/>
+                        <ValidationMessage For="@(() => _order.Header)"/>
+                    </div>
+                    <div class="row p-2">
+                        <div class="col-sm">
+                            <InputFile @onclick="@OnInputFileClick" OnChange="@OnInputFileChange" accept="image/png, image/jpeg"/>
+                        </div>
+                        <div class="col-sm">
+                            <img src="@_order.ImagePath" height="200px"/>
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <label for="Description">Комментарий</label>
+                        <textarea cols="40" rows="3" @bind="_order.Description" id = "Description" name = "Description"/>
+                        <ValidationMessage For="@(() => _order.Header)"/>
+                    </div>
+                    <div class="row p-2">
+                        <input type="submit" value="Загрузить"/>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+
+    </Authorized>
+</AuthorizeView>
+                
+                @code {
 
     private ValidationMessageStore? _messageStore;    
 

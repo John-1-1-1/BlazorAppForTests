@@ -14,6 +14,13 @@
                     <img src="@order.ImagePath" style="width: 16rem;">
                     <h5 class="card-title">@order.Header</h5>
                     <p class="card-text">@order.Description</p>
+                    <div class="d-grid position-sticky top-100">
+                        <AuthorizeView Context="auth" Roles="Admin, User">
+                            <Authorized>
+                                <button class="btn btn-primary" @onclick="@GetWork">Взять заказ</button>
+                            </Authorized>
+                        </AuthorizeView>
+                    </div>
                 </div>
             </div>
         </div>
@@ -28,6 +35,11 @@
     protected override void OnInitialized() {
         base.OnInitialized();
         _orders = DataBaseService.GetOrders();
+    }
+
+
+    private void GetWork() {
+        
     }
 
 }
