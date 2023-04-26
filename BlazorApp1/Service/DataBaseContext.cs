@@ -32,7 +32,7 @@ public sealed class DataBaseContext : DbContext {
             MiddleName = "Иванович", RoleId = 2, Pass = HashSha256Service.CreateSha256("12345678")
         };
         var user3 = new User() {
-            Id = 2, Login = "ivan3", PostId = 1, Name = "Иван", LastName = "Иванов",
+            Id = 3, Login = "ivan3", PostId = 1, Name = "Иван", LastName = "Иванов",
             MiddleName = "Иванович", RoleId = 3, Pass = HashSha256Service.CreateSha256("12345678")
         };
 

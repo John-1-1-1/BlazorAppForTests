@@ -1,5 +1,5 @@
 ﻿@page "/addOrder"
-@using Microsoft.AspNetCore.SignalR.Client;
+@using BlazorApp1.DataBaseClasses
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment _appEnvironment;
 
@@ -7,13 +7,33 @@
 
 <EditForm EditContext="@EditContext" action="upload" enctype="multipart/form-data"
           OnValidSubmit="@OnValid">
-    
     <DataAnnotationsValidator/>
-
-    <input type="file" name="uploads" a
-           @bind="@_fileUplloadModel.e"/><br>
-    <InputFile  OnChange="@OnInputFileChange" accept="image/png, image/jpeg"/>
-    <input type="submit" value="Загрузить"/>
+    
+    <div class="container">
+        <div class="p-4 border bg-light align-self-center col-md-10 offset-md-1">
+            <div class="row p-2">
+                <label for="Header">Заголовок</label>
+                <input type="text" name = "Header" id = "Header" @bind="_order.Header"/>
+                <ValidationMessage For="@(() => _order.Header)"/>
+            </div>
+            <div class="row p-2">
+                <div class="col-sm">
+                    <InputFile @onclick="@OnInputFileClick" OnChange="@OnInputFileChange" accept="image/png, image/jpeg"/>
+                </div>
+                <div class="col-sm">
+                    <img src="@_order.ImagePath" height="200px"/>
+                </div>
+            </div>
+            <div class="row p-2">
+                <label for="Description">Комментарий</label>
+                <textarea cols="40" rows="3" @bind="_order.Description" id = "Description" name = "Description"/>
+                <ValidationMessage For="@(() => _order.Header)"/>
+            </div>
+            <div class="row p-2">
+                <input type="submit" value="Загрузить"/>
+            </div>
+        </div>
+    </div>
 </EditForm>
 
 @code {
@@ -21,20 +41,13 @@
     private ValidationMessageStore? _messageStore;    
 
     private EditContext? EditContext { get; set; }
-    
-    FileUplloadModel _fileUplloadModel = new FileUplloadModel();
-    
-    public class FileUplloadModel {
-        public string? e;
-        public InputFile d;
-        public IFormFile FormFile { get; set; }
-        public object F { get; set; }
-    }
-    
+
+    private Order _order = new() {ImagePath = "question.png"};
+
     protected override void OnInitialized() {
         base.OnInitialized();
         
-        EditContext = new EditContext(_fileUplloadModel);
+        EditContext = new EditContext(_order);
         _messageStore = new ValidationMessageStore(EditContext);
     }
 
@@ -51,9 +64,15 @@
             Directory.CreateDirectory(uploadPath);
             string uploadFile = Path.Combine(uploadPath, uploadedFile.Name);
             await using FileStream fs = new(uploadFile, FileMode.Create);
-            await obj.File.OpenReadStream().CopyToAsync(fs);  
-            
+            await obj.File.OpenReadStream().CopyToAsync(fs);
+            _order.ImagePath =  Path.Combine( "upload", uploadedFile.Name);
+            InvokeAsync(StateHasChanged);
         }
-        
     }
+
+    private void OnInputFileClick() {
+        _order.ImagePath = "question.png";
+        InvokeAsync(StateHasChanged);
+    }
+
 }
