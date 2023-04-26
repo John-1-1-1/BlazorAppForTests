@@ -29,4 +29,5 @@ public class User {
     public int RoleId { get; set; } 
     [ForeignKey("RoleId")]
     public Role? Role { get; set; }
+    public List<Order> Order { get; set; }
 }

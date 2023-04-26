@@ -8,7 +8,8 @@ namespace BlazorApp1.Service;
 public sealed class DataBaseContext : DbContext {
     public DbSet<User?> Users { get; set; } = null!;
     public DbSet<PostUser> PostUsers { get; set; } = null!;
-    public DbSet<Role> Role { get; set; } = null!;
+    public DbSet<Role> Roles { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
 
     public DataBaseContext(DbContextOptions<DataBaseContext> options)
         : base(options) {
@@ -36,8 +37,14 @@ public sealed class DataBaseContext : DbContext {
             MiddleName = "Иванович", RoleId = 3, Pass = HashSha256Service.CreateSha256("12345678")
         };
 
+        var order1 = new Order() {
+            Id = 1, ImagePath = "question.png", UserId = 3,
+            Description = "Поломка описание", Header = "Поломка заголовок"
+        };
+
         modelBuilder.Entity<PostUser>().HasData(postUser);
         modelBuilder.Entity<Role>().HasData(role1, role2, role3);
         modelBuilder.Entity<User>().HasData(user1, user2, user3);
+        modelBuilder.Entity<Order>().HasData(order1);
     }
 }

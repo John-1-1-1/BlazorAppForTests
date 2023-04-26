@@ -1,7 +1,10 @@
 ﻿@page "/addOrder"
 @using BlazorApp1.DataBaseClasses
+@using BlazorApp1.Service
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment _appEnvironment;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDataBaseService DataBaseService
 
 <h2>Login Form</h2>
 
@@ -52,7 +55,12 @@
     }
 
     private void OnValid() {
-        
+        var authState =  AuthenticationStateProvider.GetAuthenticationStateAsync().Result;
+
+        _order.UserId = DataBaseService.GetUserByLogin(authState.User.FindFirst(c => c.Type == "Login")?.Value).Id;
+        DataBaseService.AddOrder(_order);
+        _order = new();
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task OnInputFileChange(InputFileChangeEventArgs obj) {
@@ -64,7 +72,7 @@
             Directory.CreateDirectory(uploadPath);
             string uploadFile = Path.Combine(uploadPath, uploadedFile.Name);
             await using FileStream fs = new(uploadFile, FileMode.Create);
-            await obj.File.OpenReadStream().CopyToAsync(fs);
+            await obj.File.OpenReadStream(maxAllowedSize:16*512000L).CopyToAsync(fs);
             _order.ImagePath =  Path.Combine( "upload", uploadedFile.Name);
             InvokeAsync(StateHasChanged);
         }

@@ -25,7 +25,7 @@ public class DataBaseService: IDataBaseService {
     }
 
     public List<Role>? GetRoles() {
-        return _dataBaseContext.Role.ToList();
+        return _dataBaseContext.Roles.ToList();
     }
     
     public List<PostUser>? GetPosts() {
@@ -47,13 +47,13 @@ public class DataBaseService: IDataBaseService {
     }
 
     public void AddRole(Role role) {
-        _dataBaseContext.Role.Add(role);
+        _dataBaseContext.Roles.Add(role);
         _dataBaseContext.SaveChanges();
     }
 
     public void DeleteRole(int roleId) {
         
-        _dataBaseContext.Role.Remove(GetRoleById(roleId));
+        _dataBaseContext.Roles.Remove(GetRoleById(roleId));
         _dataBaseContext.SaveChanges();
     }
 
@@ -67,11 +67,20 @@ public class DataBaseService: IDataBaseService {
         _dataBaseContext.SaveChanges();
     }
 
+    public List<Order> GetOrders() {
+        return _dataBaseContext.Orders.ToList();
+    }
+
+    public void AddOrder(Order order) {
+        _dataBaseContext.Orders.Add(order);
+        _dataBaseContext.SaveChanges();
+    }
+
     private PostUser GetPostById(int postId) {
         return _dataBaseContext.PostUsers.FirstOrDefault(u => u.Id == postId);
     }
 
     private Role GetRoleById(int roleId) {
-        return _dataBaseContext.Role.FirstOrDefault(u => u.Id == roleId);
+        return _dataBaseContext.Roles.FirstOrDefault(u => u.Id == roleId);
     }
 }

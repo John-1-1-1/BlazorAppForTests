@@ -1,0 +1,33 @@
+﻿@page "/OrderList"
+@using BlazorApp1.Service
+@using BlazorApp1.DataBaseClasses
+
+@inject IDataBaseService DataBaseService
+
+<h3>Список Заказов</h3>
+
+<div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3">
+    @foreach (var order in _orders) {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <img src="@order.ImagePath" style="width: 16rem;">
+                    <h5 class="card-title">@order.Header</h5>
+                    <p class="card-text">@order.Description</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+
+    private List<Order> _orders; 
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        _orders = DataBaseService.GetOrders();
+    }
+
+}

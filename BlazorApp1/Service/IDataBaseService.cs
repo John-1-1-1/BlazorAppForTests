@@ -17,4 +17,6 @@ public interface IDataBaseService {
     public void DeleteRole(int roleId);
     public void AddPost(PostUser post);
     public void DeletePost(int postId);
+    public List<Order> GetOrders();
+    public void AddOrder(Order order);
 }
