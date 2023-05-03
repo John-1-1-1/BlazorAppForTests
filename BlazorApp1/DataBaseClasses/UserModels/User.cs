@@ -18,16 +18,17 @@ public class User {
     [Required(ErrorMessage = "Логин не введён")]
     public string Login { get; set; } = "";
     [Required(ErrorMessage = "Пустое поле")]
-    [StringLength(100, MinimumLength = 8, ErrorMessage = "Длина пароля не менее 8-ми и не более 100 символов")]
+    [StringLength(100, MinimumLength = 8, ErrorMessage = 
+        "Длина пароля не менее 8-ми и не более 100 символов")]
     public string Pass { get; set; } = "";
     [Range(1,Int32.MaxValue, ErrorMessage = "Должность не выбрана")]
     public int PostId { get; set; }
     [ForeignKey("PostId")]
     public PostUser? Post { get; set; }
-
     [Range(1,Int32.MaxValue, ErrorMessage = "Роль не выбрана")]
     public int RoleId { get; set; } 
     [ForeignKey("RoleId")]
     public Role? Role { get; set; }
     public List<Order> Order { get; set; }
+    public List<OrderStates> OrderStates { get; set; }
 }

@@ -19,4 +19,9 @@ public interface IDataBaseService {
     public void DeletePost(int postId);
     public List<Order> GetOrders();
     public void AddOrder(Order order);
+
+    public void GetWork(Order order, int userId);
+    public List<Order> GetOrdersByUserId(int userId);
+    public void PerformWork(Order order);
+    public List<Order> GetOrdersByCustomerId(int userId);
 }

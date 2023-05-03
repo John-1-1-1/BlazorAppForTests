@@ -68,12 +68,46 @@ public class DataBaseService: IDataBaseService {
     }
 
     public List<Order> GetOrders() {
-        return _dataBaseContext.Orders.ToList();
+        return _dataBaseContext.Orders.
+            Include(o => o.User).
+            Include(o => o.OrderState).ToList();
     }
 
     public void AddOrder(Order order) {
+        var orderState = new OrderStates() {
+            StateOrder = 1,
+        };
+        order.OrderState = orderState;
         _dataBaseContext.Orders.Add(order);
         _dataBaseContext.SaveChanges();
+    }
+
+    public void GetWork(Order order, int userId) {
+        order.OrderState.UserId = userId;
+        order.OrderState.StateOrder += 1;
+        
+        _dataBaseContext.Orders.Update(order);
+        _dataBaseContext.SaveChanges();
+    }
+
+    public List<Order> GetOrdersByUserId(int userId) {
+        return _dataBaseContext.Orders.
+                Include(o => o.User).
+                Include(o => o.OrderState).
+            Where(o => o.OrderState.UserId == userId).ToList();
+    }
+
+    public void PerformWork(Order order) {
+        order.OrderState.StateOrder = States.ListStates[States.ListStates.Count-1].id;
+        _dataBaseContext.Orders.Update(order);
+        _dataBaseContext.SaveChanges();
+    }
+
+    public List<Order> GetOrdersByCustomerId(int userId) {
+        return _dataBaseContext.Orders.
+            Include(o => o.User).
+            Include(o => o.OrderState).
+            Where(o => o.UserId == userId).ToList();
     }
 
     private PostUser GetPostById(int postId) {

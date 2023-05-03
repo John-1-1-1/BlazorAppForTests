@@ -5,6 +5,7 @@ using System.Runtime.Versioning;
 namespace BlazorApp1.DataBaseClasses; 
 
 public class Order {
+
     [Key]
     public int Id { get; set; }
 
@@ -20,4 +21,10 @@ public class Order {
     public int UserId { get; set; } 
     [ForeignKey("UserId")]
     public User? User { get; set; }
+
+    [Range(0, Int32.MaxValue)]
+    public int OrderStateId { get; set; } 
+    [ForeignKey("OrderStateId")]
+    public OrderStates? OrderState { get; set; }
+
 }

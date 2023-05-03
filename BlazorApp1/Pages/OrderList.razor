@@ -1,15 +1,16 @@
 ﻿@page "/OrderList"
 @using BlazorApp1.Service
 @using BlazorApp1.DataBaseClasses
-
 @inject IDataBaseService DataBaseService
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>Список Заказов</h3>
 
 <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3">
     @foreach (var order in _orders) {
         <div class="col">
-            <div class="card h-100">
+            <div class="card h-100 text-center">
                 <div class="card-body">
                     <img src="@order.ImagePath" style="width: 16rem;">
                     <h5 class="card-title">@order.Header</h5>
@@ -17,11 +18,26 @@
                     <div class="d-grid position-sticky top-100">
                         <AuthorizeView Context="auth" Roles="Admin, User">
                             <Authorized>
-                                <button class="btn btn-primary" @onclick="@GetWork">Взять заказ</button>
+                                @if (@States.ListStates[order.OrderState.StateOrder - 1].id == 1) {
+                                    <button class="btn @States.ListStates[order.OrderState.StateOrder - 1].color"
+                                            @onclick="@(() => GetWork(order))">
+                                        @States.ListStates[order.OrderState.StateOrder - 1].name
+                                    </button>
+                                }else {
+                                    <button class="btn @States.ListStates[order.OrderState.StateOrder - 1].color"
+                                             disabled>
+                                        @States.ListStates[order.OrderState.StateOrder - 1].name
+                                    </button>
+                                                                }
                             </Authorized>
                         </AuthorizeView>
                     </div>
-                </div>
+                </div> 
+                <footer class="card-footer text-muted">
+                    <p>
+                        @("Добавил: " + order.User.LastName + " " + order.User.Name + " " + order.User.MiddleName)
+                    </p>
+                </footer>
             </div>
         </div>
     }
@@ -30,16 +46,23 @@
 
 @code {
 
-    private List<Order> _orders; 
+    private List<Order> _orders;
 
     protected override void OnInitialized() {
         base.OnInitialized();
         _orders = DataBaseService.GetOrders();
-    }
+  }
 
 
-    private void GetWork() {
-        
+    private void GetWork(Order order) {
+        var authState =  AuthenticationStateProvider
+            .GetAuthenticationStateAsync().Result;
+        var user = authState.User;
+        var Login = user.FindFirst(c => c.Type == "Login")?.Value;
+        var UserId = DataBaseService.GetUserByLogin(authState.User.FindFirst(c => c.Type == "Login")?.Value).Id;
+
+        DataBaseService.GetWork(order, UserId);
+        InvokeAsync(StateHasChanged);
     }
 
 }

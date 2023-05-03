@@ -1,9 +1,107 @@
 ﻿@page "/"
+@using BlazorApp1.DataBaseClasses
+@using BlazorApp1.Service
+@inject IDataBaseService DataBaseService
 
-<PageTitle>Index</PageTitle>
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h1>Hello, world!</h1>
+<PageTitle>Основная</PageTitle>
 
-Welcome to your new app.
+<AuthorizeView Context="auth" Roles="Admin">
+    <Authorized>
+        <h1>Вы являетесь администратором</h1>  
+        Основная роль, которую выполняет администратор - работа с аккаунтами пользователей: 
+        добавление, удаление пользователей.
+    </Authorized>
+</AuthorizeView>
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+<AuthorizeView Context="auth" Roles="Customer">
+    <Authorized>
+        <h1>Вы являетесь работодателем</h1>  
+        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3">
+                    @foreach (var order in DataBaseService.GetOrdersByCustomerId(UserId)) {
+                        <div class="col">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    <img src="@order.ImagePath" style="width: 16rem;">
+                                    <h5 class="card-title">@order.Header</h5>
+                                    <p class="card-text">@order.Description</p>
+                                    <div class="d-grid position-sticky top-100">
+                                        <p class="btn @States.ListStates[order.OrderState.StateOrder - 1].color">
+                                            @States.ListStates[order.OrderState.StateOrder - 1].name
+                                        </p>
+                                    </div>
+                                </div>
+                                <footer class="card-footer text-muted">
+                                    <p>
+                                        @("Добавил: " + order.User.LastName + " " + order.User.Name + " " + order.User.MiddleName)
+                                    </p>
+                                </footer>
+                            </div>
+                        </div>
+                    }
+                </div>
+    </Authorized>
+</AuthorizeView>
+
+
+<AuthorizeView Context="auth" Roles="User">
+    <Authorized>
+        <h1>Вы являетесь рабочим</h1>  
+        <p>Вы принимаете и выполняете различные заказы</p>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Context="auth" Roles="Admin, User">
+    <Authorized>
+        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3">
+            @foreach (var order in _orders) {
+                <div class="col">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <img src="@order.ImagePath" style="width: 16rem;">
+                            <h5 class="card-title">@order.Header</h5>
+                            <p class="card-text">@order.Description</p>
+                            <div class="d-grid position-sticky top-100">
+                                <button class="btn @States.ListStates[order.OrderState.StateOrder - 1].color"
+                                        @onclick="@(() => PerformWork(order))">
+                                    @States.ListStates[order.OrderState.StateOrder - 1].name
+                                </button>
+                            </div>
+                        </div>
+                        <footer class="card-footer text-muted">
+                            <p>
+                                @("Добавил: " + order.User.LastName + " " + order.User.Name + " " + order.User.MiddleName)
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+    private List<Order> _orders;
+
+    private int UserId;
+    
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        
+        var authState =  AuthenticationStateProvider
+            .GetAuthenticationStateAsync().Result;
+        var user = authState.User;
+        var Login = user.FindFirst(c => c.Type == "Login")?.Value;
+        UserId = DataBaseService.GetUserByLogin(authState.User.FindFirst(c => c.Type == "Login")?.Value).Id;
+        
+        _orders = DataBaseService.GetOrdersByUserId(UserId);
+  }
+
+
+    private void PerformWork(Order order) {
+        DataBaseService.PerformWork(order);
+    }
+}
+

@@ -10,6 +10,7 @@ public sealed class DataBaseContext : DbContext {
     public DbSet<PostUser> PostUsers { get; set; } = null!;
     public DbSet<Role> Roles { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<OrderStates> OrderStates { get; set; } = null!;
 
     public DataBaseContext(DbContextOptions<DataBaseContext> options)
         : base(options) {
@@ -37,14 +38,24 @@ public sealed class DataBaseContext : DbContext {
             MiddleName = "Иванович", RoleId = 3, Pass = HashSha256Service.CreateSha256("12345678")
         };
 
+        var orderState1 = new OrderStates() {
+            Id = 1,
+            StateOrder = States.ListStates[0].id
+        };
+        
         var order1 = new Order() {
             Id = 1, ImagePath = "question.png", UserId = 3,
-            Description = "Поломка описание", Header = "Поломка заголовок"
+            Description = "Поломка описание", Header = "Поломка заголовок",
+            OrderStateId = 1
         };
-
+        
+        
+        
         modelBuilder.Entity<PostUser>().HasData(postUser);
         modelBuilder.Entity<Role>().HasData(role1, role2, role3);
         modelBuilder.Entity<User>().HasData(user1, user2, user3);
+        modelBuilder.Entity<OrderStates>().HasData(orderState1);
         modelBuilder.Entity<Order>().HasData(order1);
+        
     }
 }
